@@ -1,0 +1,12 @@
+# Устанавливаем для всех текстовых файлов нормальные LF
+* text=auto
+
+# Явно для CSS, JS, TS, JSX, TSX, HTML
+*.css text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md text eol=lf
