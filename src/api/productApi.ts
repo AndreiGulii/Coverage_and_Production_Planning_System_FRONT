@@ -10,7 +10,10 @@ export type ProductDto = {
   code?: string;
 };
 
-export const getProducts = () => api.get<ProductDto[]>("/products");
+export const getProducts = async (): Promise<ProductDto[]> => {
+  const { data } = await api.get<ProductDto[]>("/products");
+  return data;
+};
 export const createProduct = (payload: ProductDto) => api.post("/products", payload);
 export const updateProduct = (id: string, payload: ProductDto) => api.put(`/products/${id}`, payload);
 export const deleteProduct = (id: string) => api.delete(`/products/${id}`);
