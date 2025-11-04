@@ -202,7 +202,7 @@ export default function BomsPage() {
           className="bg-blue-500 text-white px-4 py-2 rounded col-span-4"
           onClick={handleAdd}
         >
-          Добавить
+          [ Добавить ]
         </button>
       </div>
 
@@ -210,28 +210,28 @@ export default function BomsPage() {
       <table className="w-full border-collapse border text-sm">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border p-2">Продукт</th>
-            <th className="border p-2">Кол-во / ед.</th>
-            <th className="border p-2">Материал</th>
-            <th className="border p-2">Кол-во / ед.</th>
-            <th className="border p-2">Версия</th>
-            <th className="border p-2">Действия</th>
+            <th className="border p-2">[ Продукт ]</th>
+            <th className="border p-2">[ Кол-во / ед. ]</th>
+            <th className="border p-2">[ Материал ]</th>
+            <th className="border p-2">[ Кол-во / ед. ]</th>
+            <th className="border p-2">[ Версия ]</th>
+            <th className="border p-2">[ Действия ]</th>
           </tr>
         </thead>
         <tbody>
           {boms.map((b) => (
             <tr key={b.id}>
-              <td className="border p-2">{b.productName || "-"}</td>
-              <td className="border p-2">{b.productMe} {b.productMeh || "-"}</td>
-              <td className="border p-2">{b.materialName || "-"}</td>
-              <td className="border p-2">{b.materialMe} {b.materialMeh || "-"}</td>
-              <td className="border p-2">{b.version || "-"}</td>
+              <td className="border p-2">{"[ "+b.productName +" ]" || "-"}</td>
+              <td className="border p-2">{"[ " +b.productMe } {b.productMeh+ "   ]" || "-"}</td>
+              <td className="border p-2">{"[ " + b.materialName + " ]" || "-"}</td>
+              <td className="border p-2">{"[ " + b.materialMe} {b.materialMeh + " ]" || "-"}</td>
+              <td className="border p-2">{"[ " + b.version + " ]" || "-"}</td>
               <td className="border p-2 text-center">
                 <button
                   onClick={() => handleDelete(b.id)}
                   className="bg-red-500 text-white px-2 py-1 rounded"
                 >
-                  Удалить
+                  [ Удалить ]
                 </button>
               </td>
             </tr>
