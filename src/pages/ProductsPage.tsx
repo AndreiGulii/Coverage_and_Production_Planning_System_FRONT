@@ -10,14 +10,6 @@ interface Product {
   code: string;
 }
 
-interface ProductDto {
-  id?: string;
-  name: string;
-  description?: string;
-  unit?: string;
-  category?: string;
-  code?: string;
-}
 
 export default function ProductsPage(){
     const [products, setProducts]= useState<Product[]>([]);
@@ -27,8 +19,8 @@ export default function ProductsPage(){
     }, []);
 
     const loadProducts = async () => {
-  const { data } = await getProducts(); // ProductDto[]
-  const productsMapped: Product[] = (data as ProductDto[]).map(p => ({
+  const  data  = await getProducts(); // ProductDto[]
+  const productsMapped: Product[] = data.map(p => ({
     id: p.id || "",
     name: p.name,
     description: p.description || "",

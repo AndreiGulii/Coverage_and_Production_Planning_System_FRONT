@@ -8,6 +8,7 @@ const api = axios.create({
 export type OrderItemDto = {
   productId: string;
   quantity: number;
+  bedarfsdatum: string;
 };
 
 export type OrderRequestDto = {
@@ -36,6 +37,7 @@ export type OrderResponseDto = {
     id: string;
     product: ProductDto;
     quantity: number;
+    bedarfsdatum: string;
   }[];
   status: string;
   createdAt: string;

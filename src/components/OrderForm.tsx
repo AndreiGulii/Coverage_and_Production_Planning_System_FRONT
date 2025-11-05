@@ -22,6 +22,7 @@ type Props = {
 type OrderItemForm = {
   productId: string;
   quantity: number;
+  bedarfsdatum: string;
 };
 
 
@@ -30,12 +31,12 @@ export default function OrderForm({ clients, products, onSaved }: Props) {
   const [clientId, setClientId] = useState("");
   const [status, setStatus] = useState("NEW");
   const [items, setItems] = useState<OrderItemForm[]>([
-  { productId: "", quantity: 1 },
+  { productId: "", quantity: 1 , bedarfsdatum: "2025-11-05"},
 ]);
   const [loading, setLoading] = useState(false);
 
   const handleAddItem = () => {
-    setItems([...items, { productId: "", quantity: 1 }]);
+    setItems([...items, { productId: "", quantity: 1, bedarfsdatum: "2025-11-05" }]);
   };
 
   const handleRemoveItem = (index: number) => {
@@ -60,7 +61,7 @@ export default function OrderForm({ clients, products, onSaved }: Props) {
       onSaved?.();
       alert("✅ Заказ успешно создан");
       setClientId("");
-      setItems([{ productId: "", quantity: 1 }]);
+      setItems([{ productId: "", quantity: 1, bedarfsdatum: "2025-11-05" }]);
     } catch (err) {
       console.error(err);
       alert("❌ Ошибка при создании заказа");
@@ -90,7 +91,7 @@ export default function OrderForm({ clients, products, onSaved }: Props) {
       </select>
 
       {/* Статус */}
-      <label className="block mb-2 font-medium">Статус</label>
+      <label className="block mb-2 font-medium">--Статус--</label>
       <select
         className="border rounded p-2 w-full mb-4"
         value={status}
@@ -126,6 +127,15 @@ export default function OrderForm({ clients, products, onSaved }: Props) {
             onChange={(e) => handleChangeItem(i, "quantity", Number(e.target.value))}
             required
           />
+
+          <input
+            type="date"
+            className="border rounded p-2"
+            value={item.bedarfsdatum || ""}
+            onChange={(e) => handleChangeItem(i, "bedarfsdatum", e.target.value)}
+            required
+          />
+
           <Button
             type="button"
             variant="destructive"
@@ -138,7 +148,7 @@ export default function OrderForm({ clients, products, onSaved }: Props) {
       ))}
 
       <Button type="button" variant="outline" className="mb-4" onClick={handleAddItem}>
-        ➕ Добавить позицию
+        + Добавить позицию
       </Button>
 
       <Button type="submit" className="w-full" disabled={loading}>

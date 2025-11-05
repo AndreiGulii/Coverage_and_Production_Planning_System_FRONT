@@ -7,6 +7,8 @@ import OrdersPage from "./pages/OrdersPage";
 import BomsPage from "./pages/BomPage";
 import MaterialsPage from "./pages/MaterialsPage";
 import SemiproductsPage from "./pages/SemiproductsPage";
+import StockPage from "./pages/StockPage";
+import CoveragePage from "./pages/CoveragePage";
 
 export default function App() {
   useEffect(() => {
@@ -20,12 +22,15 @@ export default function App() {
   return (
     <Router>
       <nav className="p-4 bg-gray-200 flex gap-4">
-        <Link to="/clients">Клиенты</Link>
-        <Link to="/products">Продукты</Link>
-        <Link to="/orders">Заказы</Link>
-        <Link to="/materials" className="hover:underline">Материалы</Link>
-        <Link to="/semiproducts" className="hover:underline">Полуфабрикаты</Link>
-        <Link to="/boms" className="hover:underline">BOM</Link>
+        <Link to="/clients">[ Клиенты ] </Link>
+        <Link to="/products">[ Продукты ] </Link>
+        <Link to="/orders">[ Заказы ] </Link>
+        <Link to="/materials" className="hover:underline">[ Материалы ] </Link>
+        <Link to="/semiproducts" className="hover:underline">[ Полуфабрикаты ] </Link>
+        <Link to="/boms" className="hover:underline">[ BOM ] </Link>
+        <Link to="/stock" className="hover:underline">[ Склад ] </Link>
+        <Link to="/coverage" className="hover:underline">[ Покрытие запасов ]</Link>
+        
       </nav>
 
       <Routes>
@@ -36,6 +41,8 @@ export default function App() {
         <Route path="/materials" element={<MaterialsPage />} />
         <Route path="/semiproducts" element={<SemiproductsPage />} />
         <Route path="/boms" element={<BomsPage />} />
+        <Route path="/stock" element={<StockPage />} />
+        <Route path="/coverage" element={<CoveragePage />} />
       </Routes>
     </Router>
   );
