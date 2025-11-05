@@ -202,7 +202,7 @@ export default function BomsPage() {
           className="bg-blue-500 text-white px-4 py-2 rounded col-span-4"
           onClick={handleAdd}
         >
-          [ Добавить ]
+          [ + Добавить Bom ]
         </button>
       </div>
 
@@ -231,7 +231,7 @@ export default function BomsPage() {
                   onClick={() => handleDelete(b.id)}
                   className="bg-red-500 text-white px-2 py-1 rounded"
                 >
-                  [ Удалить ]
+                  [ X Удалить строку BOM ]
                 </button>
               </td>
             </tr>

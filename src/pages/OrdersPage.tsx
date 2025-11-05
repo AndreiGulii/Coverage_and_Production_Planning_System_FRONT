@@ -19,6 +19,7 @@ interface Product {
 interface OrderItem {
   productId: string;
   quantity: number;
+  bedarfsdatum: string;
 }
 
 interface Order {
@@ -33,7 +34,7 @@ interface Order {
 interface OrderResponseDto {
   id: string;
   client: Client;
-  items: { id: string; product: Product; quantity: number }[];
+  items: { id: string; product: Product; quantity: number; bedarfsdatum: string; }[];
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -46,7 +47,7 @@ export default function OrdersPage() {
 
   const [newOrder, setNewOrder] = useState<{
     clientId: string;
-    items: { productId: string; quantity: number }[];
+    items: { productId: string; quantity: number; bedarfsdatum: string; }[];
     status: string;
   }>({
     clientId: "",
@@ -71,6 +72,7 @@ export default function OrdersPage() {
     items: dto.items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
+      bedarfsdatum: item.bedarfsdatum,
     })),
     status: dto.status,
     createdAt: dto.createdAt,
@@ -86,14 +88,14 @@ export default function OrdersPage() {
   };
 
   const loadProducts = async () => {
-    const { data } = await getProducts();
+    const  data  = await getProducts();
     setProducts(data as Product[]);
   };
 
   const handleAddItem = () => {
     setNewOrder({
       ...newOrder,
-      items: [...newOrder.items, { productId: "", quantity: 1 }],
+      items: [...newOrder.items, { productId: "", quantity: 1, bedarfsdatum: "2025-11-05" }],
     });
   };
 
@@ -157,6 +159,13 @@ export default function OrdersPage() {
               value={item.quantity}
               onChange={(e) => handleItemChange(index, "quantity", parseFloat(e.target.value))}
             />
+            <input
+            type="date"
+            className="border rounded p-2"
+            value={item.bedarfsdatum || ""}
+            onChange={(e) => handleItemChange(index, "bedarfsdatum", e.target.value)}
+            required
+          />
           </div>
         ))}
 
@@ -179,10 +188,11 @@ export default function OrdersPage() {
       <table className="w-full border-collapse border">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border p-2">Клиент</th>
-            <th className="border p-2">Позиции</th>
-            <th className="border p-2">Статус</th>
-            <th className="border p-2">Действия</th>
+            <th className="border p-2">[ --Клиент-- ]</th>
+            <th className="border p-2">[ --Позиции-- ]</th>
+            <th className="border p-2">[ --Статус-- ]</th>
+            <th className="border p-2">[ --Действия-- ]</th>
+            <th className="border p-2">[ --Дата потребности-- ]</th>
           </tr>
         </thead>
         <tbody>
@@ -193,6 +203,7 @@ export default function OrdersPage() {
                 {order.items.map((item) => (
                   <div key={item.productId}>
                     {products.find((p) => p.id === item.productId)?.name || item.productId} — {item.quantity}
+                    {item.bedarfsdatum ? new Date(item.bedarfsdatum).toLocaleDateString() : "-"}
                   </div>
                 ))}
               </td>
