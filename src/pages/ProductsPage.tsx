@@ -89,6 +89,7 @@ export default function ProductsPage(){
       <table className="w-full border-collapse border">
         <thead className="bg-gray-100">
           <tr>
+            <th className="border p-2">ID </th>
             <th className="border p-2">Имя</th>
             <th className="border p-2">Описание</th>
             <th className="border p-2">Ед. измер.</th>
@@ -100,6 +101,7 @@ export default function ProductsPage(){
         <tbody>
           {products.map(c => (
             <tr key={c.id}>
+              <td className="border p-2">{c.id}</td>
               <td className="border p-2">{c.name}</td>
               <td className="border p-2">{c.description}</td>
               <td className="border p-2">{c.unit}</td>
