@@ -17,3 +17,5 @@ export const getProducts = async (): Promise<ProductDto[]> => {
 export const createProduct = (payload: ProductDto) => api.post("/products", payload);
 export const updateProduct = (id: string, payload: ProductDto) => api.put(`/products/${id}`, payload);
 export const deleteProduct = (id: string) => api.delete(`/products/${id}`);
+const ProductAPI = { getProducts, createProduct, updateProduct, deleteProduct };
+export default ProductAPI;

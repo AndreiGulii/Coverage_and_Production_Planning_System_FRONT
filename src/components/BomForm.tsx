@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import type { MeasurementUnit } from '../types/MeasurementUnit';
 import { measurementUnits } from '../types/MeasurementUnit';
-import type { Bom } from '../types/Bom';
+import type { BomRequestDto } from '../types/Bom';
 
-const initialBom: Bom = {
+const initialBom: BomRequestDto = {
   productId: '',
   productType: 'product',
   productMe: 0,
@@ -16,7 +16,7 @@ const initialBom: Bom = {
 };
 
 export const BomForm = () => {
-  const [bom, setBom] = useState<Bom>(initialBom);
+  const [bom, setBom] = useState<BomRequestDto>(initialBom);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +58,8 @@ export const BomForm = () => {
           ))}
         </select>
       </div>
+
+      <button type="submit">Добавить BOM</button>
     </form>
   );
 };

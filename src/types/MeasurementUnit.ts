@@ -1,5 +1,5 @@
-// Тип единиц измерения
+// src/types/MeasurementUnit.ts
 export type MeasurementUnit = 'KG' | 'L' | 'M' | 'ST';
 
-// Массив всех единиц для select
+// массив единиц измерения для селектов
 export const measurementUnits: MeasurementUnit[] = ['KG', 'L', 'M', 'ST'];

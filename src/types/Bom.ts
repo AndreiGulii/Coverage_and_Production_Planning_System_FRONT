@@ -1,13 +1,19 @@
-import type { MeasurementUnit } from './MeasurementUnit';
+// src/types/Bom.ts
 
-export interface Bom {
+export interface BomRequestDto {
   productId: string;
-  productType: 'product' | 'semiproduct';
+  productType: "product" | "semiproduct";
   productMe: number;
-  productMeh: MeasurementUnit;
+  productMeh: string;
   materialId: string;
-  materialType: 'material' | 'semiproduct';
+  materialType: "material" | "semiproduct";
   materialMe: number;
-  materialMeh: MeasurementUnit;
+  materialMeh: string;
   version: string;
+}
+
+export interface BomResponseDto extends BomRequestDto {
+  id: string;
+  productName?: string;
+  materialName?: string;
 }

@@ -5,7 +5,7 @@ import type { BomRequestDto, BomResponseDto } from "../api/bomApi";
 import { getProducts } from "../api/productApi";
 import { getMaterials } from "../api/materialApi";
 import { getSemiproducts } from "../api/semiproductApi";
-import type { MeasurementUnit } from "@/types/MeasurementUnit";
+import type { MeasurementUnit } from "../types/MeasurementUnit";
 import { measurementUnits } from "../types/MeasurementUnit";
 
 type ProductType = "product" | "semiproduct";
@@ -44,13 +44,11 @@ export default function BomsPage() {
 
       setBoms(bomsData);
 
-      // Продукты + полуфабрикаты
       const productOpts: Option[] = [
         ...productsData.map(p => ({ id: p.id || "", name: p.name, type: "product" as const })),
         ...semiproductsData.map(s => ({ id: s.id, name: s.name, type: "semiproduct" as const })),
       ];
 
-      // Материалы + полуфабрикаты
       const materialOpts: Option[] = [
         ...materialsData.map(m => ({ id: m.id || "", name: m.name, type: "material" as const })),
         ...semiproductsData.map(s => ({ id: s.id, name: s.name, type: "semiproduct" as const })),
@@ -64,31 +62,31 @@ export default function BomsPage() {
   };
 
   const handleAdd = async () => {
-  console.log("Отправляем BOM:", newBom); // ← сюда добавляешь
+    console.log("Отправляем BOM:", newBom);
 
-  if (!newBom.productId || !newBom.materialId) {
-    alert("⚠️ Выберите продукт и материал");
-    return;
-  }
+    if (!newBom.productId || !newBom.materialId) {
+      alert("⚠️ Выберите продукт и материал");
+      return;
+    }
 
-  try {
-    await createBom(newBom);
-    setNewBom({
-      productId: "",
-      productType: "product",
-      productMe: 1,
-      productMeh: "",
-      materialId: "",
-      materialType: "material",
-      materialMe: 1,
-      materialMeh: "",
-      version: "",
-    });
-    await loadData();
-  } catch (err) {
-    console.error("Ошибка при добавлении BOM:", err);
-  }
-};
+    try {
+      await createBom(newBom);
+      setNewBom({
+        productId: "",
+        productType: "product",
+        productMe: 1,
+        productMeh: "",
+        materialId: "",
+        materialType: "material",
+        materialMe: 1,
+        materialMeh: "",
+        version: "",
+      });
+      await loadData();
+    } catch (err) {
+      console.error("Ошибка при добавлении BOM:", err);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (!id) return;
@@ -137,18 +135,19 @@ export default function BomsPage() {
           value={newBom.productMe}
           onChange={(e) => setNewBom({ ...newBom, productMe: Number(e.target.value) })}
         />
+
         <select
-  className="border p-2 rounded"
-  value={newBom.productMeh}
-  onChange={(e) => setNewBom({ ...newBom, productMeh: e.target.value as MeasurementUnit })}
->
-  <option value="">Выберите ед. изм.</option>
-  {measurementUnits.map((unit) => (
-    <option key={unit} value={unit}>
-      {unit}
-    </option>
-  ))}
-</select>
+          className="border p-2 rounded"
+          value={newBom.productMeh}
+          onChange={(e) => setNewBom({ ...newBom, productMeh: e.target.value as MeasurementUnit })}
+        >
+          <option value="">Выберите ед. изм.</option>
+          {measurementUnits.map((unit) => (
+            <option key={unit} value={unit}>
+              {unit}
+            </option>
+          ))}
+        </select>
 
         <select
           className="border p-2 rounded"
@@ -179,17 +178,19 @@ export default function BomsPage() {
           value={newBom.materialMe}
           onChange={(e) => setNewBom({ ...newBom, materialMe: Number(e.target.value) })}
         />
+
         <select
           className="border p-2 rounded"
           value={newBom.materialMeh}
           onChange={(e) => setNewBom({ ...newBom, materialMeh: e.target.value as MeasurementUnit })}
         >
-        {measurementUnits.map((unit) => (
-          <option key={unit} value={unit}>
-          {unit}
-          </option>
-        ))}
-</select>
+          <option value="">Выберите ед. изм.</option>
+          {measurementUnits.map((unit) => (
+            <option key={unit} value={unit}>
+              {unit}
+            </option>
+          ))}
+        </select>
 
         <input
           className="border p-2 rounded"
@@ -221,11 +222,15 @@ export default function BomsPage() {
         <tbody>
           {boms.map((b) => (
             <tr key={b.id}>
-              <td className="border p-2">{"[ "+b.productName +" ]" || "-"}</td>
-              <td className="border p-2">{"[ " +b.productMe } {b.productMeh+ "   ]" || "-"}</td>
-              <td className="border p-2">{"[ " + b.materialName + " ]" || "-"}</td>
-              <td className="border p-2">{"[ " + b.materialMe} {b.materialMeh + " ]" || "-"}</td>
-              <td className="border p-2">{"[ " + b.version + " ]" || "-"}</td>
+              <td className="border p-2">{b.productName || "-"}</td>
+              <td className="border p-2">
+                {b.productMe} {b.productMeh || "-"}
+              </td>
+              <td className="border p-2">{b.materialName || "-"}</td>
+              <td className="border p-2">
+                {b.materialMe} {b.materialMeh || "-"}
+              </td>
+              <td className="border p-2">{b.version || "-"}</td>
               <td className="border p-2 text-center">
                 <button
                   onClick={() => handleDelete(b.id)}
