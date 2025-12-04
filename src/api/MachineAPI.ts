@@ -5,7 +5,7 @@ export interface Machine {
   id: string; // теперь точно string
   name: string;
   description?: string;
-  workplaces?: number;
+  workplace?: number;
   items?: MachineItem[]; // ← используем MachineItem
   capabilities?: MachineItem[]; // ← тоже MachineItem
 }

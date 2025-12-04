@@ -87,7 +87,7 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
   // -----------------------------
   const handleSaveMachine = async () => {
     try {
-      await MachineAPI.create({ name, description, workplaces: Number(workplaces) || 1 });
+      await MachineAPI.create({ name, description, workplace: Number(workplaces) || 1 });
       setName("");
       setDescription("");
       setWorkplaces("");
@@ -233,7 +233,7 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
       <h3 style={{ marginTop: 40 }}>Список всех машин и их продуктов</h3>
       {machines.map(machine => (
         <div key={machine.id} style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
-          <strong>{machine.name}</strong> (Рабочие места: {machine.workplaces || 0})<br />
+          <strong>{machine.name}</strong> (Рабочие места: {machine.workplace || 0})<br />
           <em>{machine.description}</em>
 
           {machine.items && machine.items.length > 0 ? (
