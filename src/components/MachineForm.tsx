@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import MachineAPI from "../api/MachineAPI";
-import type { Machine, Item } from "../api/MachineAPI";
-import * as ProductAPI from "../api/productApi";
-import * as SemiproductAPI from "../api/semiproductApi";
+import type { Machine} from "../api/MachineAPI";
 
 interface MachineFormProps {
   onSaved: () => void;
 }
 
+interface SelectableItem {
+  id: string;
+  name: string;
+  description?: string;
+  type: "product" | "semiproduct";
+}
+
+// Типы для данных с API
+interface ProductAPIResponse {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [workplaces, setWorkplaces] = useState(1);
+  const [workplaces, setWorkplaces] = useState<number | "">("");
 
   const [machines, setMachines] = useState<Machine[]>([]);
-  const [products, setProducts] = useState<Item[]>([]);
-  const [semiproducts, setSemiproducts] = useState<Item[]>([]);
+  const [products, setProducts] = useState<SelectableItem[]>([]);
+  const [semiproducts, setSemiproducts] = useState<SelectableItem[]>([]);
 
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string>("");
@@ -26,81 +38,106 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
   const [productionTimePerUnit, setProductionTimePerUnit] = useState<number>(1);
   const [setupTime, setSetupTime] = useState<number | "">("");
 
+  // -----------------------------
+  // Загрузка продуктов и машин
+  // -----------------------------
   useEffect(() => {
-    fetchProducts();
-    fetchSemiproducts();
-    fetchMachinesWithItems();
+    const fetchData = async () => {
+      try {
+        // 1. Продукты и полуфабрикаты
+        const productsRes = await fetch("/api/products").then(r => r.json()) as ProductAPIResponse[];
+        const semiproductsRes = await fetch("/api/semiproducts").then(r => r.json()) as ProductAPIResponse[];
+
+        setProducts(
+          productsRes.map(p => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            type: "product" as const,
+          }))
+        );
+
+        setSemiproducts(
+          semiproductsRes.map(p => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            type: "semiproduct" as const,
+          }))
+        );
+
+        // 2. Машины с capabilities
+        const machinesRes = await MachineAPI.getAll();
+        const machinesWithItems = machinesRes.data.map(m => ({
+          ...m,
+          items: m.capabilities || [], // берем продукты из capabilities
+        }));
+
+        setMachines(machinesWithItems);
+      } catch (error) {
+        console.error("Ошибка при загрузке данных:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const fetchProducts = async () => {
-    const data = await ProductAPI.getProducts();
-    setProducts(
-      data.map(p => ({
-        id: p.id?.toString(),
-        name: p.name,
-        type: "product" as const,
-        description: p.description
-      }))
-    );
-  };
-
-  const fetchSemiproducts = async () => {
-    const data = await SemiproductAPI.getSemiproducts();
-    setSemiproducts(
-      data.map(p => ({
-        id: p.id?.toString(),
-        name: p.name,
-        type: "semiproduct" as const,
-        description: p.description
-      }))
-    );
-  };
-
-  // Загружаем машины вместе с их продуктами из таблицы machine_product
-  const fetchMachinesWithItems = async () => {
-    const res = await MachineAPI.getAll();
-    const machinesWithItems = await Promise.all(
-      res.data.map(async machine => {
-        const itemsRes = await MachineAPI.getMachineProducts(machine.id!); // <--- используем исправленный метод
-        return { ...machine, items: itemsRes.data };
-      })
-    );
-    setMachines(machinesWithItems);
-  };
-
+  // -----------------------------
+  // Сохранение новой машины
+  // -----------------------------
   const handleSaveMachine = async () => {
-    await MachineAPI.create({ name, description, workplaces });
-    setName(""); setDescription(""); setWorkplaces(1);
-    await fetchMachinesWithItems();
-    onSaved();
+    try {
+      await MachineAPI.create({ name, description, workplaces: Number(workplaces) || 1 });
+      setName("");
+      setDescription("");
+      setWorkplaces("");
+      onSaved();
+
+      const machinesRes = await MachineAPI.getAll();
+      const machinesWithItems = machinesRes.data.map(m => ({
+        ...m,
+        items: m.capabilities || [],
+      }));
+      setMachines(machinesWithItems);
+    } catch (error) {
+      console.error("Ошибка при создании машины:", error);
+    }
   };
 
+  // -----------------------------
+  // Добавление продукта/полуфабриката к машине
+  // -----------------------------
   const handleAddItemToMachine = async () => {
     if (!selectedMachine || !selectedItemId) return;
 
-    const setup = !selectedMachine.items || selectedMachine.items.length === 0 ? setupTime || 0 : 0;
+    const setup = !selectedMachine.items || selectedMachine.items.length === 0 ? Number(setupTime) || 0 : 0;
 
-    await MachineAPI.addItemToMachine(
-      selectedMachine.id!,
-      selectedItemId,
-      selectedType,
-      minBatch,
-      productionTimePerUnit,
-      setup
-    );
+    try {
+      await MachineAPI.addItemToMachine(
+        selectedMachine.id,
+        selectedItemId,
+        selectedType,
+        minBatch,
+        productionTimePerUnit,
+        setup
+      );
 
-    // сброс значений
-    setSelectedItemId("");
-    setMinBatch(1);
-    setProductionTimePerUnit(1);
-    setSetupTime("");
+      setSelectedItemId("");
+      setMinBatch(1);
+      setProductionTimePerUnit(1);
+      setSetupTime("");
 
-    await fetchMachinesWithItems();
-  };
+      const machinesRes = await MachineAPI.getAll();
+      const machinesWithItems = machinesRes.data.map(m => ({
+        ...m,
+        items: m.capabilities || [],
+      }));
+      setMachines(machinesWithItems);
 
-  const handleDeleteItem = async (itemId: string) => {
-    await MachineAPI.deleteItem(itemId);
-    await fetchMachinesWithItems();
+      setSelectedMachine(machinesWithItems.find(m => m.id === selectedMachine.id) || null);
+    } catch (error) {
+      console.error("Ошибка при добавлении элемента:", error);
+    }
   };
 
   const itemsToSelect = selectedType === "product" ? products : semiproducts;
@@ -110,7 +147,13 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
       <h3>Добавить машину</h3>
       <TextField label="Название" value={name} onChange={e => setName(e.target.value)} style={{ marginRight: 10 }} />
       <TextField label="Описание" value={description} onChange={e => setDescription(e.target.value)} style={{ marginRight: 10 }} />
-      <TextField label="Рабочие места" type="number" value={workplaces} onChange={e => setWorkplaces(Number(e.target.value))} style={{ marginRight: 10 }} />
+      <TextField
+        label="Рабочие места"
+        type="number"
+        value={workplaces}
+        onChange={e => setWorkplaces(Number(e.target.value))}
+        style={{ marginRight: 10 }}
+      />
       <Button onClick={handleSaveMachine} variant="contained" color="primary">Сохранить</Button>
 
       <h4 style={{ marginTop: 20 }}>Назначить продукт/полуфабрикат машине</h4>
@@ -164,6 +207,7 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
             onChange={e => setProductionTimePerUnit(Number(e.target.value))}
             style={{ width: 150, marginRight: 10 }}
           />
+
           {(!selectedMachine.items || selectedMachine.items.length === 0) && (
             <TextField
               label="Время переналадки (setup)"
@@ -179,8 +223,7 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
           <ul style={{ marginTop: 10 }}>
             {selectedMachine.items?.map(item => (
               <li key={item.id}>
-                {item.name} ({item.type}) — minBatch: {item.minBatch}, productionTime: {item.productionTimePerUnit}, setup: {item.setupTime}
-                <Button style={{ marginLeft: 10 }} variant="outlined" color="error" size="small" onClick={() => handleDeleteItem(item.id!)}>Удалить</Button>
+                {item.object?.name || "—"} ({item.itemType}) — minBatch: {item.minBatch}, productionTime: {item.productionTimePerUnit}, setup: {item.setupTime}
               </li>
             ))}
           </ul>
@@ -190,13 +233,14 @@ export const MachineForm: React.FC<MachineFormProps> = ({ onSaved }) => {
       <h3 style={{ marginTop: 40 }}>Список всех машин и их продуктов</h3>
       {machines.map(machine => (
         <div key={machine.id} style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
-          <strong>{machine.name}</strong> (Рабочие места: {machine.workplaces})<br />
+          <strong>{machine.name}</strong> (Рабочие места: {machine.workplaces || 0})<br />
           <em>{machine.description}</em>
+
           {machine.items && machine.items.length > 0 ? (
             <ul>
               {machine.items.map(item => (
                 <li key={item.id}>
-                  {item.name} ({item.type}) — minBatch: {item.minBatch}, productionTime: {item.productionTimePerUnit}, setup: {item.setupTime}
+                  {item.object?.name || "—"} ({item.itemType}) — minBatch: {item.minBatch}, productionTime: {item.productionTimePerUnit}, setup: {item.setupTime}
                 </li>
               ))}
             </ul>
