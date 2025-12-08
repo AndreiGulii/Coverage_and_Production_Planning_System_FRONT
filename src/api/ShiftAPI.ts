@@ -3,10 +3,17 @@ import type { AxiosResponse } from "axios"
 
 export interface Shift {
   id?: number;
-  startTime: string;
-  endTime: string;
+  name: string; // название смены
+  shiftStartTime: string; // начало смены
+  shiftEndTime: string;   // конец смены
+  firstPauseStartTime?: string;
+  firstPauseEndTime?: string;
+  secondPauseStartTime?: string;
+  secondPauseEndTime?: string;
   color?: string;
   isWorking?: boolean;
+  createdAt?: string; // optional, для отображения
+  updatedAt?: string; // optional, для отображения
 }
 
 const BASE = "/api/shifts";
