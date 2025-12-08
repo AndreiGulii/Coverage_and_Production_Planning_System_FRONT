@@ -109,12 +109,22 @@ export const ShiftForm: React.FC<ShiftFormProps> = ({ onChanged }) => {
       <TextField label="Вторая пауза - начало" value={secondPauseStartTime} onChange={e => setSecondPauseStartTime(e.target.value)} style={{ marginLeft: 10 }} />
       <TextField label="Вторая пауза - конец" value={secondPauseEndTime} onChange={e => setSecondPauseEndTime(e.target.value)} style={{ marginLeft: 10 }} />
 
-      <TextField label="Цвет" type="color" value={color} onChange={e => setColor(e.target.value)} style={{ marginLeft: 10 }} />
+      {/* Поле цвета с шириной и кодом цвета */}
+      <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+        <label style={{ marginRight: 10 }}>Цвет:</label>
+        <input
+          type="color"
+          value={color}
+          onChange={e => setColor(e.target.value)}
+          style={{ width: 150, height: 40, border: "none", cursor: "pointer" }}
+        />
+        <span style={{ marginLeft: 10, fontWeight: 500 }}>{color}</span>
+      </div>
 
       <FormControlLabel
         control={<Checkbox checked={isWorking} onChange={e => setIsWorking(e.target.checked)} />}
         label="Рабочая смена"
-        style={{ marginLeft: 10 }}
+        style={{ marginLeft: 10, marginTop: 10 }}
       />
 
       <Button variant="contained" onClick={saveShift} style={{ marginLeft: 10, marginTop: 10 }}>
