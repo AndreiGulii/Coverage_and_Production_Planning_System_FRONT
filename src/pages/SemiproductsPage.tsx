@@ -1,14 +1,22 @@
-// src/pages/SemiproductsPage.tsx
 import { useEffect, useState } from "react";
-import { getSemiproducts, createSemiproduct, deleteSemiproduct } from "../api/semiproductApi";
+import {
+  getSemiproducts,
+  createSemiproduct,
+  deleteSemiproduct,
+  updateSemiproduct
+} from "../api/semiproductApi";
 import type { SemiproductDto } from "../api/semiproductApi";
 
 export default function SemiproductsPage() {
   const [semiproducts, setSemiproducts] = useState<SemiproductDto[]>([]);
-  const [newSemiproduct, setNewSemiproduct] = useState<Partial<SemiproductDto>>({
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [form, setForm] = useState<SemiproductDto>({
+    id: "",
     name: "",
     description: "",
-    unit: ""
+    unit: "",
+    color: "#72ea72"
   });
 
   useEffect(() => {
@@ -17,18 +25,50 @@ export default function SemiproductsPage() {
 
   const loadSemiproducts = async () => {
     const data = await getSemiproducts();
-    setSemiproducts(data);
+    setSemiproducts(
+      data.map(d => ({
+        ...d,
+        color: d.color || "#72ea72"
+      }))
+    );
   };
 
-  const handleAdd = async () => {
-    if (!newSemiproduct.name || !newSemiproduct.unit) {
-      alert("⚠️ Заполните название и единицу измерения");
+  const clearForm = () => {
+    setEditingId(null);
+    setForm({
+      id: "",
+      name: "",
+      description: "",
+      unit: "",
+      color: "#72ea72"
+    });
+  };
+
+  const handleSave = async () => {
+    if (!form.name || !form.unit) {
+      alert("Заполните название и единицу измерения");
       return;
     }
 
-    await createSemiproduct(newSemiproduct as SemiproductDto);
-    setNewSemiproduct({ name: "", description: "", unit: "" });
+    if (editingId) {
+      await updateSemiproduct(editingId, form);
+    } else {
+      await createSemiproduct(form);
+    }
+
+    clearForm();
     await loadSemiproducts();
+  };
+
+  const handleEdit = (s: SemiproductDto) => {
+    setEditingId(s.id!);
+    setForm({
+      id: s.id,
+      name: s.name,
+      description: s.description || "",
+      unit: s.unit || "",
+      color: s.color || "#72ea72"
+    });
   };
 
   const handleDelete = async (id: string) => {
@@ -42,41 +82,54 @@ export default function SemiproductsPage() {
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Полуфабрикаты</h1>
 
-      {/* Форма добавления */}
-      <div className="grid grid-cols-4 gap-2 mb-4">
+      {/* Форма */}
+      <div className="grid grid-cols-5 gap-2 mb-4">
         <input
           className="border p-2 rounded"
           placeholder="Название"
-          value={newSemiproduct.name}
-          onChange={(e) => setNewSemiproduct({ ...newSemiproduct, name: e.target.value })}
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
         <input
           className="border p-2 rounded"
           placeholder="Описание"
-          value={newSemiproduct.description}
-          onChange={(e) => setNewSemiproduct({ ...newSemiproduct, description: e.target.value })}
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
         <input
           className="border p-2 rounded"
           placeholder="Ед. изм."
-          value={newSemiproduct.unit}
-          onChange={(e) => setNewSemiproduct({ ...newSemiproduct, unit: e.target.value })}
+          value={form.unit}
+          onChange={(e) => setForm({ ...form, unit: e.target.value })}
         />
+
+        {/* Цвет */}
+        <div className="flex items-center">
+          <input
+            type="color"
+            value={form.color}
+            onChange={(e) => setForm({ ...form, color: e.target.value })}
+            className="w-16 h-10 border rounded cursor-pointer"
+          />
+          <span className="ml-2">{form.color}</span>
+        </div>
+
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={handleAdd}
+          onClick={handleSave}
         >
-          Добавить
+          {editingId ? "Сохранить" : "Добавить"}
         </button>
       </div>
 
-      {/* Таблица полуфабрикатов */}
+      {/* Таблица */}
       <table className="w-full border-collapse border text-sm">
         <thead className="bg-gray-100">
           <tr>
             <th className="border p-2">Название</th>
             <th className="border p-2">Описание</th>
             <th className="border p-2">Ед. изм.</th>
+            <th className="border p-2">Цвет</th>
             <th className="border p-2">Действия</th>
           </tr>
         </thead>
@@ -86,10 +139,29 @@ export default function SemiproductsPage() {
               <td className="border p-2">{s.name}</td>
               <td className="border p-2">{s.description}</td>
               <td className="border p-2">{s.unit}</td>
-              <td className="border p-2 text-center">
+              <td className="border p-2">
+                <div className="flex items-center">
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      background: s.color ?? "#72ea72"
+                    }}
+                  />
+                  <span className="ml-2">{s.color}</span>
+                </div>
+              </td>
+              <td className="border p-2 text-center space-x-2">
+                <button
+                  className="bg-yellow-500 text-white px-2 py-1 rounded"
+                  onClick={() => handleEdit(s)}
+                >
+                  Редактировать
+                </button>
                 <button
                   className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => handleDelete(s.id)}
+                  onClick={() => handleDelete(s.id!)}
                 >
                   Удалить
                 </button>

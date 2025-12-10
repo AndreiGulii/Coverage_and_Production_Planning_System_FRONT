@@ -8,6 +8,7 @@ export type ProductDto = {
   unit?: string;
   category?:string
   code?: string;
+  color?: string;
 };
 
 export const getProducts = async (): Promise<ProductDto[]> => {
