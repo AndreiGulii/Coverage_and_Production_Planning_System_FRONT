@@ -45,14 +45,30 @@ export default function BomsPage() {
       setBoms(bomsData);
 
       const productOpts: Option[] = [
-        ...productsData.map(p => ({ id: p.id || "", name: p.name, type: "product" as const })),
-        ...semiproductsData.map(s => ({ id: s.id, name: s.name, type: "semiproduct" as const })),
-      ];
+  ...productsData.map(p => ({
+    id: p.id ?? "",        // Гарантируем string
+    name: p.name,
+    type: "product" as const
+  })),
+  ...semiproductsData.map(s => ({
+    id: s.id ?? "",        // Гарантируем string
+    name: s.name,
+    type: "semiproduct" as const
+  })),
+];
 
-      const materialOpts: Option[] = [
-        ...materialsData.map(m => ({ id: m.id || "", name: m.name, type: "material" as const })),
-        ...semiproductsData.map(s => ({ id: s.id, name: s.name, type: "semiproduct" as const })),
-      ];
+const materialOpts: Option[] = [
+  ...materialsData.map(m => ({
+    id: m.id ?? "",
+    name: m.name,
+    type: "material" as const
+  })),
+  ...semiproductsData.map(s => ({
+    id: s.id ?? "",
+    name: s.name,
+    type: "semiproduct" as const
+  })),
+];
 
       setProducts(productOpts);
       setMaterials(materialOpts);

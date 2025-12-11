@@ -25,6 +25,8 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
     const [width, setWidth] = useState<number>(3256);
     const [height, setHeight] = useState<number>(759);
     const [manufacturer, setManufacturer] = useState<string>("Hydraulyx");
+    const [installationTime, setInstallationTime] = useState<number>(0);
+    const [deinstallationTime, setDeinstallationTime] = useState<number>(0);
     const [active, setActive] = useState<boolean>(false);
 
     const [products, setProducts] = useState<ProductDto[]>([]);
@@ -86,6 +88,8 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
                 width,
                 height,
                 manufacturer,
+                installationTime,
+                deinstallationTime,
                 active,
                 products: selectedProducts.map(id => ({ id })),
                 semiproducts: selectedSemiproducts.map(id => ({ id })),
@@ -126,6 +130,8 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
         setWidth(p.width);
         setHeight(p.height);
         setManufacturer(p.manufacturer);
+        setInstallationTime(p.installationTime);
+        setDeinstallationTime(p.deinstallationTime);
         setActive(Boolean(p.active));
         setSelectedProducts(Array.isArray(p.products) ? p.products.map(pr => pr.id ?? "") : []);
         setSelectedSemiproducts(Array.isArray(p.semiproducts) ? p.semiproducts.map(sp => sp.id ?? "") : []);
@@ -141,6 +147,8 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
         setWidth(0);
         setHeight(0);
         setManufacturer("");
+        setInstallationTime(0);
+        setDeinstallationTime(0);
         setActive(false);
         setSelectedProducts([]);
         setSelectedSemiproducts([]);
@@ -151,18 +159,20 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
             <h3>Управление пресс-формами</h3>
 
             <TextField label="Название" value={name} onChange={e => setName(e.target.value)} />
-            <TextField label="Описание" value={description} onChange={e => setDescription(e.target.value)} style={{ marginLeft: 10 }} />
-            <TextField label="Вес пресс-формы" type="number" value={weight} onChange={e => setWeight(Number(e.target.value))} style={{ marginLeft: 10 }} />
-            <TextField label="Кол-во частей" type="number" value={parts} onChange={e => setParts(Number(e.target.value))} style={{ marginLeft: 10 }} />
-            <TextField label="Длина (мм)" type="number" value={length} onChange={e => setLength(Number(e.target.value))} style={{ marginLeft: 10 }} />
-            <TextField label="Ширина (мм)" type="number" value={width} onChange={e => setWidth(Number(e.target.value))} style={{ marginLeft: 10 }} />
-            <TextField label="Высота (мм)" type="number" value={height} onChange={e => setHeight(Number(e.target.value))} style={{ marginLeft: 10 }} />
-            <TextField label="Производитель" value={manufacturer} onChange={e => setManufacturer(e.target.value)} style={{ marginLeft: 10 }} />
+            <TextField label="Описание" value={description} onChange={e => setDescription(e.target.value)} style={{ marginLeft: 5 }} />
+            <TextField label="Вес пресс-формы" type="number" value={weight} onChange={e => setWeight(Number(e.target.value))} style={{ marginLeft: 5 }} />
+            <TextField label="Кол-во частей" type="number" value={parts} onChange={e => setParts(Number(e.target.value))} style={{ marginLeft: 5 }} />
+            <TextField label="Длина (мм)" type="number" value={length} onChange={e => setLength(Number(e.target.value))} style={{ marginLeft: 5 }} />
+            <TextField label="Ширина (мм)" type="number" value={width} onChange={e => setWidth(Number(e.target.value))} style={{ marginLeft: 5 }} />
+            <TextField label="Высота (мм)" type="number" value={height} onChange={e => setHeight(Number(e.target.value))} style={{ marginLeft: 5 }} />
+            <TextField label="Производитель" value={manufacturer} onChange={e => setManufacturer(e.target.value)} style={{ marginLeft: 5 }} />
+            <TextField label="Время монтажа мин" value={installationTime} onChange={e => setInstallationTime(Number(e.target.value))} style={{ marginLeft: 5 }} />
+            <TextField label="Время демонтажа мин" value={deinstallationTime} onChange={e => setDeinstallationTime(Number(e.target.value))} style={{ marginLeft: 5 }} />
 
-            <FormControlLabel control={<Checkbox checked={active} onChange={e => setActive(e.target.checked)} />} label="Исправная пресс-форма" style={{ marginLeft: 10, marginTop: 10 }} />
+            <FormControlLabel control={<Checkbox checked={active} onChange={e => setActive(e.target.checked)} />} label="Исправная пресс-форма" style={{ marginTop: 5 }} />
 
             {/* Продукты */}
-            <div style={{ marginTop: 20 }}>
+            <div style={{ marginTop: 10 }}>
                 <h4>Продукты, которые можно производить</h4>
                 <div style={{ display: "flex", flexWrap: "wrap" }}>
                     {Array.isArray(products) && products.map(p => (
@@ -179,7 +189,7 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
             </div>
 
             {/* Полуфабрикаты */}
-            <div style={{ marginTop: 20 }}>
+            <div style={{ marginTop: 10 }}>
                 <h4>Полуфабрикаты, которые можно производить</h4>
                 <div style={{ display: "flex", flexWrap: "wrap" }}>
                     {Array.isArray(semiproducts) && semiproducts.map(s => (
@@ -208,6 +218,8 @@ export const PressformForm: React.FC<PressformFormProps> = ({ onChanged }) => {
                             Вес: {s.weight} кг, Частей: {s.parts}<br />
                             Габариты: {s.length}×{s.width}×{s.height} мм<br />
                             Производитель: {s.manufacturer}<br />
+                            Время монтажа: {s.installationTime}<br />
+                            Время демонтажа: {s.deinstallationTime}<br /> 
                             Статус: {s.active ? "Исправная" : "Заблокирована"}<br />
 
                             {Array.isArray(s.products) && s.products.length > 0 && (

@@ -13,6 +13,8 @@ export interface Pressform {
     width: number // ширина пресс-формы в мм
     height: number // высота пресс-формы в мм
     manufacturer: string // производитель пресс-формы
+    installationTime: number // время монтажа пресс-формы в мин
+    deinstallationTime: number // время демонтажа пресс-формы в мин
     active: boolean // в эксплуатации или на ремонте
     products?: { id: string; name?: string }[];
     semiproducts?: { id: string; name?: string }[];
