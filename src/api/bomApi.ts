@@ -22,8 +22,10 @@ export interface BomResponseDto {
     id: string;
     productId: string;
     productName: string;
+    productType: "product" | "semiproduct";   // <-- новое
     materialId: string;
     materialName: string;
+    materialType: "material" | "semiproduct"; // <-- новое
     productMe: number;
     productMeh?: string;
     materialMe: number;
@@ -36,10 +38,10 @@ const API_URL = "/api/boms";
 // ===== Внутренний тип для raw ответа сервера =====
 interface BomRawDto {
     id: string;
-    product?: { id: string; name: string };
+    product?: { id: string; name: string; type: "product" | "semiproduct" };
     productId?: string;
     productName?: string;
-    material?: { id: string; name: string };
+    material?: { id: string; name: string; type: "material" | "semiproduct" };
     materialId?: string;
     materialName?: string;
     productMe: number;
@@ -58,15 +60,17 @@ export const getBoms = async (): Promise<BomResponseDto[]> => {
 
         return data.map(b => ({
             id: b.id,
-            productId: b.product?.id || b.productId || "",
-            productName: b.product?.name || b.productName || "",
-            materialId: b.material?.id || b.materialId || "",
-            materialName: b.material?.name || b.materialName || "",
-            productMe: b.productMe,
-            productMeh: b.productMeh,
-            materialMe: b.materialMe,
-            materialMeh: b.materialMeh,
-            version: b.version,
+    productId: b.product?.id || b.productId || "",
+    productName: b.product?.name || b.productName || "",
+    productType: b.product?.type || "product",           // <-- новый
+    materialId: b.material?.id || b.materialId || "",
+    materialName: b.material?.name || b.materialName || "",
+    materialType: b.material?.type || "material",       // <-- новый
+    productMe: b.productMe,
+    productMeh: b.productMeh,
+    materialMe: b.materialMe,
+    materialMeh: b.materialMeh,
+    version: b.version,
         }));
     } catch (error) {
         console.error('Ошибка запроса BOM:', error);
@@ -74,7 +78,7 @@ export const getBoms = async (): Promise<BomResponseDto[]> => {
     }
 };
 
-// Получить BOM по ID
+/// Получить BOM по ID
 export const getBomById = async (id: string): Promise<BomResponseDto> => {
     const { data } = await axios.get<BomRawDto>(`${API_URL}/${id}`);
 
@@ -82,8 +86,10 @@ export const getBomById = async (id: string): Promise<BomResponseDto> => {
         id: data.id,
         productId: data.product?.id || data.productId || "",
         productName: data.product?.name || data.productName || "",
+        productType: data.product?.type || "product",         // <-- добавлено
         materialId: data.material?.id || data.materialId || "",
         materialName: data.material?.name || data.materialName || "",
+        materialType: data.material?.type || "material",      // <-- добавлено
         productMe: data.productMe,
         productMeh: data.productMeh,
         materialMe: data.materialMe,
@@ -100,8 +106,10 @@ export const createBom = async (dto: BomRequestDto): Promise<BomResponseDto> => 
         id: data.id,
         productId: data.product?.id || data.productId || "",
         productName: data.product?.name || data.productName || "",
+        productType: data.product?.type || "product",         // <-- добавлено
         materialId: data.material?.id || data.materialId || "",
         materialName: data.material?.name || data.materialName || "",
+        materialType: data.material?.type || "material",      // <-- добавлено
         productMe: data.productMe,
         productMeh: data.productMeh,
         materialMe: data.materialMe,
@@ -118,8 +126,10 @@ export const updateBom = async (id: string, dto: BomRequestDto): Promise<BomResp
         id: data.id,
         productId: data.product?.id || data.productId || "",
         productName: data.product?.name || data.productName || "",
+        productType: data.product?.type || "product",         // <-- добавлено
         materialId: data.material?.id || data.materialId || "",
         materialName: data.material?.name || data.materialName || "",
+        materialType: data.material?.type || "material",      // <-- добавлено
         productMe: data.productMe,
         productMeh: data.productMeh,
         materialMe: data.materialMe,
@@ -127,7 +137,6 @@ export const updateBom = async (id: string, dto: BomRequestDto): Promise<BomResp
         version: data.version,
     };
 };
-
 // Удалить BOM
 export const deleteBom = async (id: string): Promise<void> => {
     await axios.delete(`${API_URL}/${id}`);

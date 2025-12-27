@@ -11,9 +11,8 @@ import MaterialsPage from "./pages/MaterialsPage";
 import SemiproductsPage from "./pages/SemiproductsPage";
 import StockPage from "./pages/StockPage";
 import CoveragePage from "./pages/CoveragePage";
-
-// Новая страница для Production Planner
 import ProductionConfig from "./pages/ProductionConfig";
+import ProductionPlannerPage from "./pages/ProductionPlannerPage";
 
 export default function App() {
   useEffect(() => {
@@ -27,32 +26,35 @@ export default function App() {
   return (
     <Router>
       <nav className="p-4 bg-gray-200 flex gap-4 flex-wrap">
-        <Link to="/">[ Главная ]</Link>
-        <Link to="/clients">[ Клиенты ]</Link>
-        <Link to="/products">[ Продукты ]</Link>
-        <Link to="/orders">[ Заказы ]</Link>
-        <Link to="/materials">[ Материалы ]</Link>
-        <Link to="/semiproducts">[ Полуфабрикаты ]</Link>
-        <Link to="/boms">[ BOM ]</Link>
-        <Link to="/stock">[ Склад ]</Link>
-        <Link to="/coverage">[ Покрытие запасов ]</Link>
-        <Link to="/production">[ Планирование производства ]</Link>
-      </nav>
+  <Link to="/">[ Главная ]</Link>
+  <Link to="/clients">[ Клиенты ]</Link>
+  <Link to="/products">[ Продукты ]</Link>
+  <Link to="/orders">[ Заказы ]</Link>
+  <Link to="/materials">[ Материалы ]</Link>
+  <Link to="/semiproducts">[ Полуфабрикаты ]</Link>
+  <Link to="/boms">[ BOM ]</Link>
+  <Link to="/stock">[ Склад ]</Link>
+  <Link to="/coverage">[ Покрытие запасов ]</Link>
+
+  <Link to="/production/planner">[ Планирование ]</Link>
+  <Link to="/production/config">[ Конфигурация производства ]</Link>
+</nav>
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/clients" element={<ClientsPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/orders" element={<OrdersPage />} />
-        <Route path="/materials" element={<MaterialsPage />} />
-        <Route path="/semiproducts" element={<SemiproductsPage />} />
-        <Route path="/boms" element={<BomsPage />} />
-        <Route path="/stock" element={<StockPage />} />
-        <Route path="/coverage" element={<CoveragePage />} />
+  <Route path="/" element={<Home />} />
+  <Route path="/clients" element={<ClientsPage />} />
+  <Route path="/products" element={<ProductsPage />} />
+  <Route path="/orders" element={<OrdersPage />} />
+  <Route path="/materials" element={<MaterialsPage />} />
+  <Route path="/semiproducts" element={<SemiproductsPage />} />
+  <Route path="/boms" element={<BomsPage />} />
+  <Route path="/stock" element={<StockPage />} />
+  <Route path="/coverage" element={<CoveragePage />} />
 
-        {/* Новый маршрут для Production Planner */}
-        <Route path="/production" element={<ProductionConfig />} />
-      </Routes>
+  {/* Производство */}
+  <Route path="/production/config" element={<ProductionConfig />} />
+  <Route path="/production/planner" element={<ProductionPlannerPage />} />
+</Routes>
     </Router>
   );
 }
