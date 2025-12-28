@@ -14,28 +14,26 @@ export default function CoveragePage() {
     loadBoms();
   }, []);
 
-  // === ГЛАВНОЕ ИСПРАВЛЕНИЕ: присваиваем productType вручную ===
+  // ======================================================
+  // РЕКУРСИВНО разворачиваем дерево coverage
+  // ======================================================
+  const flattenCoverage = (nodes: CoverageDto[]): CoverageDto[] => {
+    const result: CoverageDto[] = [];
+
+    const dfs = (node: CoverageDto) => {
+      result.push(node);
+
+      node.semiproductCoverage?.forEach(dfs);
+      node.materialCoverage?.forEach(dfs);
+    };
+
+    nodes.forEach(dfs);
+    return result;
+  };
+
   const loadCoverage = async () => {
     const data = await getCoverage();
-
-    const flat: CoverageDto[] = [];
-
-    data.forEach((p) => {
-      // Продукт
-      flat.push({ ...p, productType: "product" });
-
-      // Полупродукты
-      p.semiproductCoverage?.forEach((sp) => {
-        flat.push({ ...sp, productType: "semiproduct" });
-      });
-
-      // Материалы
-      p.materialCoverage?.forEach((m) => {
-        flat.push({ ...m, productType: "material" });
-      });
-    });
-
-    setCoverage(flat);
+    setCoverage(flattenCoverage(data));
   };
 
   const loadBoms = async () => {
@@ -50,33 +48,37 @@ export default function CoveragePage() {
     new Set(coverage.flatMap((c) => c.days.map((d) => d.date)))
   ).sort();
 
-  // Фильтры теперь работают
+  // === корректные фильтры ===
   const products = coverage.filter((c) => c.productType === "product");
   const semiproducts = coverage.filter((c) => c.productType === "semiproduct");
   const materials = coverage.filter((c) => c.productType === "material");
 
   const renderRow = (c: CoverageDto) => {
-    const initialStock = c.stock ?? 0;
-    const demandByDate = new Map<string, number>();
-    c.days.forEach((d) => demandByDate.set(d.date, d.demand ?? 0));
+  const rowKey = `${c.productType}:${c.productId}`;
+  const initialStock = c.stock ?? 0;
 
-    const isExpanded = expanded[c.productId] ?? false;
-    let cumulative = 0;
+  const demandByDate = new Map<string, number>();
+  c.days.forEach((d) => demandByDate.set(d.date, d.demand ?? 0));
 
-    const bomList = boms.filter((b) => b.productId === c.productId);
+  const isExpanded = expanded[rowKey] ?? false;
+  let cumulative = 0;
 
-    return (
-      <tbody key={c.productId}>
-        <tr className="bg-white">
-          <td className="border p-2">
-            <button
-              className="px-2 py-1 bg-blue-600 text-white rounded mr-2"
-              onClick={() => toggleExpand(c.productId)}
-            >
-              {isExpanded ? "−" : "+"}
-            </button>
-            {c.productId}
-          </td>
+  const bomList = boms.filter(
+    (b) => b.productId === c.productId
+  );
+
+  return (
+    <tbody key={rowKey}>
+      <tr className="bg-white">
+        <td className="border p-2">
+          <button
+            className="px-2 py-1 bg-blue-600 text-white rounded mr-2"
+            onClick={() => toggleExpand(rowKey)}
+          >
+            {isExpanded ? "−" : "+"}
+          </button>
+          {c.productId}
+        </td>
 
           <td className="border p-2 font-semibold">{c.productName}</td>
           <td className="border p-2">{c.description}</td>
@@ -107,8 +109,7 @@ export default function CoveragePage() {
             <td colSpan={5 + allDates.length} className="border p-4 text-left">
               {bomList.length > 0 ? (
                 <>
-                  <h3 className="font-bold mb-2 text-lg">BOM (Рецептура)</h3>
-
+                  <h3 className="font-bold mb-2 text-lg">BOM</h3>
                   <table className="w-full text-sm border">
                     <thead className="bg-gray-200">
                       <tr>
@@ -142,7 +143,9 @@ export default function CoveragePage() {
 
   return (
     <div className="p-8 w-full max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-center">Покрытие запасов</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Покрытие запасов
+      </h1>
 
       {/* === Продукты === */}
       <h2 className="text-xl font-semibold mb-4">Продукты</h2>
@@ -162,7 +165,7 @@ export default function CoveragePage() {
               ))}
             </tr>
           </thead>
-          {products.map((c) => renderRow(c))}
+          {products.map(renderRow)}
         </table>
       </div>
 
@@ -184,7 +187,7 @@ export default function CoveragePage() {
               ))}
             </tr>
           </thead>
-          {semiproducts.map((c) => renderRow(c))}
+          {semiproducts.map(renderRow)}
         </table>
       </div>
 
@@ -206,7 +209,7 @@ export default function CoveragePage() {
               ))}
             </tr>
           </thead>
-          {materials.map((c) => renderRow(c))}
+          {materials.map(renderRow)}
         </table>
       </div>
     </div>
